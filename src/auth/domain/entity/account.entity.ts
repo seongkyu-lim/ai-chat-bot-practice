@@ -21,8 +21,6 @@ export class Account extends BaseEntity {
   })
   role: AccountRole;
 
-
-
   static from(requestDto: AccountRegisterReqDto) {
     const account = new Account();
     account.email = requestDto.email;

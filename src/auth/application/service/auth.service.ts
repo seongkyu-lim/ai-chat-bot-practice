@@ -13,6 +13,7 @@ import { AccountLoginResDto } from '../../presentation/dto/response.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
+import { AccountRole } from '../../domain/enum/account-role.enum';
 
 @Injectable()
 export class AuthService implements AuthUseCase {
@@ -52,5 +53,21 @@ export class AuthService implements AuthUseCase {
         },
       ),
     );
+  }
+
+  async getAccountRole(accountId: string): Promise<AccountRole> {
+    const acc = await this.accountRepository.findOne({
+      where: { id: accountId },
+    });
+    if (!acc) throw new UnauthorizedException();
+    return acc.role;
+  }
+
+  async getAccountById(accountId: string): Promise<Account> {
+    const acc = await this.accountRepository.findOne({
+      where: { id: accountId },
+    });
+    if (!acc) throw new UnauthorizedException(`Invalid account: ${accountId}`);
+    return acc;
   }
 }
