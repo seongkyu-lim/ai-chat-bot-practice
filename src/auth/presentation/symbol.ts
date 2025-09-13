@@ -1,0 +1,1 @@
+export const AUTH_USE_CASE = Symbol('AUTH_USE_CASE');
