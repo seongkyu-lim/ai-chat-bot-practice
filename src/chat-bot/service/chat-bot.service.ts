@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -9,6 +10,7 @@ import { Thread } from '../domain/entity/thread.entity';
 import { Chat } from '../domain/entity/chat.entity';
 import { AccountRole } from '../../auth/domain/enum/account-role.enum';
 import { generateAnswer } from '../../common/openai/openai.provider';
+import { ChatCreationHistory } from '../domain/entity/chat-creation-history.entity';
 import { AuthService } from '../../auth/application/service/auth.service';
 
 @Injectable()
@@ -17,6 +19,8 @@ export class ChatBotService {
     @InjectRepository(Thread)
     private readonly threadRepository: Repository<Thread>,
     @InjectRepository(Chat) private readonly chatRepository: Repository<Chat>,
+    @InjectRepository(ChatCreationHistory)
+    private readonly chatCreationHistoryRepository: Repository<ChatCreationHistory>,
     private readonly authService: AuthService,
   ) {}
 
@@ -36,6 +40,12 @@ export class ChatBotService {
 
     thread.lastActivityAt = savedChat.createdAt;
     await this.threadRepository.save(thread);
+
+    // record chat creation history
+    const hist = new ChatCreationHistory();
+    hist.account = thread.owner as any;
+    hist.chat = savedChat as any;
+    await this.chatCreationHistoryRepository.save(hist);
 
     return { chat: savedChat, thread };
   }
@@ -92,7 +102,7 @@ export class ChatBotService {
     if (!thread) throw new NotFoundException('Thread not found');
 
     if (role !== AccountRole.ADMIN && thread.owner.id !== requesterId)
-      throw new UnauthorizedException('Cannot delete this thread');
+      throw new ForbiddenException('Cannot delete this thread');
 
     await this.threadRepository.softDelete(threadId);
     return { success: true };

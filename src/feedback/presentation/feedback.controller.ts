@@ -42,7 +42,7 @@ export class FeedbackController {
   }
 
   @UseGuards(AuthGuard)
-  @Get()
+  @Get('list')
   async list(
     @Req() req: Request,
     @Query('page', new ParseIntPipe({ optional: true })) page = 1,

@@ -28,7 +28,7 @@ export class ChatBotController {
   ) {}
 
   @UseGuards(AuthGuard)
-  @Post('chats')
+  @Post('chat')
   async createChat(
     @Req() req: Request,
     @Body() body: CreateChatReqDto,
@@ -44,7 +44,7 @@ export class ChatBotController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('chats')
+  @Get('chat/list')
   async listChats(
     @Req() req: Request,
     @Query('page', new ParseIntPipe({ optional: true })) page = 1,
@@ -63,7 +63,7 @@ export class ChatBotController {
   }
 
   @UseGuards(AuthGuard)
-  @Delete('threads/:id')
+  @Delete('thread/:id')
   async deleteThread(@Req() req: Request, @Param('id') id: string) {
     const accountId = (req as any).user?.sub as string;
     const role = await this.authService.getAccountRole(accountId);

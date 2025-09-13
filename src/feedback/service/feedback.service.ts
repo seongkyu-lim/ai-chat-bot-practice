@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -110,7 +111,7 @@ export class FeedbackService {
     status: FeedbackStatus,
   ) {
     if (requesterRole !== AccountRole.ADMIN)
-      throw new UnauthorizedException('Only admin can update status');
+      throw new ForbiddenException('Only admin can update status');
     const fb = await this.feedbackRepository.findOne({
       where: { id: feedbackId },
     });
